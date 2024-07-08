@@ -25,9 +25,9 @@ function PostCreateForm() {
     title: "",
     text: "",
     image: "",
-    selectedCategory: "", // Changed from selectedCategories to selectedCategory
+    selectedCategories: [],
   });
-  const { title, text, image, selectedCategory } = postData;
+  const { title, text, image, selectedCategories } = postData;
 
   const imageInput = useRef(null);
   const history = useHistory();
@@ -36,8 +36,8 @@ function PostCreateForm() {
     const fetchCategories = async () => {
       try {
         const { data } = await axiosReq.get("/categories/");
-        console.log('Fetched Categories:', data);
-        setCategories(data.results || []); // Ensure categories is always an array
+        console.log("Fetched Categories:", data);
+        setCategories(data.results || []);
       } catch (err) {
         console.log(err);
         setCategories([]);
@@ -64,6 +64,20 @@ function PostCreateForm() {
     }
   };
 
+  const handleCategoryChange = (event) => {
+    const options = event.target.options;
+    const selectedCategories = [];
+    for (let i = 0, l = options.length; i < l; i++) {
+      if (options[i].selected) {
+        selectedCategories.push(options[i].value);
+      }
+    }
+    setPostData({
+      ...postData,
+      selectedCategories: selectedCategories,
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData();
@@ -73,15 +87,19 @@ function PostCreateForm() {
     if (imageInput.current.files[0]) {
       formData.append("image", imageInput.current.files[0]);
     }
-    if (selectedCategory) {
-      formData.append("category", selectedCategory); // Changed to a single category
+    selectedCategories.forEach((category) =>
+      formData.append("categories", category)
+    );
+
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
     }
 
     try {
       const { data } = await axiosReq.post("/contents/", formData);
       history.push(`/contents/${data.id}`);
     } catch (err) {
-      console.log(err);
+      console.log("Error:", err.response ? err.response.data : err);
       if (err.response?.status !== 401) {
         setErrors(err.response?.data);
       }
@@ -122,19 +140,20 @@ function PostCreateForm() {
       ))}
 
       <Form.Group>
-        <Form.Label>Category</Form.Label> {/* Changed label to singular */}
+        <Form.Label>Category</Form.Label>
         <Form.Control
           as="select"
-          name="selectedCategory" // Changed name attribute
-          value={selectedCategory} // Changed value attribute
-          onChange={handleChange} // Simplified change handler
+          name="selectedCategories"
+          value={selectedCategories}
+          onChange={handleCategoryChange}
+          multiple
         >
-          <option value="">Select a category</option> {/* Added default option */}
-          {Array.isArray(categories) && categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
+          {Array.isArray(categories) &&
+            categories.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
         </Form.Control>
       </Form.Group>
       {errors?.categories?.map((message, idx) => (
@@ -191,9 +210,10 @@ function PostCreateForm() {
 
               <Form.File
                 id="image-upload"
-                accept="image/*"
-                onChange={handleChangeImage}
                 ref={imageInput}
+                onChange={handleChangeImage}
+                accept="image/*"
+                className="d-none"
               />
             </Form.Group>
             {errors?.image?.map((message, idx) => (
@@ -202,11 +222,8 @@ function PostCreateForm() {
               </Alert>
             ))}
 
-            <div className="d-md-none">{textFields}</div>
+            <div>{textFields}</div>
           </Container>
-        </Col>
-        <Col md={5} lg={4} className="d-none d-md-block p-0 p-md-2">
-          <Container className={appStyles.Content}>{textFields}</Container>
         </Col>
       </Row>
     </Form>
