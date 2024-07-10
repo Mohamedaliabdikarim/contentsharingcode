@@ -6,17 +6,18 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Alert from "react-bootstrap/Alert";
 import Image from "react-bootstrap/Image";
+
 import Asset from "../../components/Asset";
 import Upload from "../../assets/upload.png";
+
 import styles from "../../styles/PostCreateEditForm.module.css";
 import appStyles from "../../App.module.css";
 import btnStyles from "../../styles/Button.module.css";
+
 import { useHistory } from "react-router";
 import { axiosReq } from "../../api/axiosDefaults";
-import { useRedirect } from "../../hooks/useRedirect";
 
 function PostCreateForm() {
-  useRedirect("loggedOut");
   const [errors, setErrors] = useState({});
   const [categories, setCategories] = useState([]);
 
@@ -24,9 +25,9 @@ function PostCreateForm() {
     title: "",
     content: "",
     image: "",
-    selectedCategories: [],
+    category_id: "", // Ensure this matches the backend field name
   });
-  const { title, content, image, selectedCategories } = postData;
+  const { title, content, image, category_id } = postData;
 
   const imageInput = useRef(null);
   const history = useHistory();
@@ -35,7 +36,6 @@ function PostCreateForm() {
     const fetchCategories = async () => {
       try {
         const { data } = await axiosReq.get("/categories/");
-        console.log("Fetched Categories:", data);
         setCategories(data.results || []);
       } catch (err) {
         console.log(err);
@@ -63,41 +63,24 @@ function PostCreateForm() {
     }
   };
 
-  const handleCategoryChange = (event) => {
-    const options = event.target.options;
-    const selectedCategories = [];
-    for (let i = 0, l = options.length; i < l; i++) {
-      if (options[i].selected) {
-        selectedCategories.push(options[i].value);
-      }
-    }
-    setPostData({
-      ...postData,
-      selectedCategories: selectedCategories,
-    });
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData();
 
     formData.append("title", title);
     formData.append("content", content);
-    formData.append("image", imageInput.current.files[0]);
-
-    selectedCategories.forEach((category) =>
-      formData.append("categories", category)
-    );
-
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
+    if (imageInput.current.files[0]) {
+      formData.append("image", imageInput.current.files[0]);
+    }
+    if (category_id) {
+      formData.append("category_id", category_id);
     }
 
     try {
       const { data } = await axiosReq.post("/posts/", formData);
       history.push(`/posts/${data.id}`);
     } catch (err) {
-      // console.log(err);
+      console.log(err);
       if (err.response?.status !== 401) {
         setErrors(err.response?.data);
       }
@@ -122,29 +105,6 @@ function PostCreateForm() {
       ))}
 
       <Form.Group>
-        <Form.Label>Category</Form.Label>
-        <Form.Control
-          as="select"
-          name="selectedCategories"
-          value={selectedCategories}
-          onChange={handleCategoryChange}
-          multiple
-        >
-          {Array.isArray(categories) &&
-            categories.map((category) => (
-              <option key={category.id} value={category.name}>
-                {category.name}
-              </option>
-            ))}
-        </Form.Control>
-      </Form.Group>
-      {errors?.categories?.map((message, idx) => (
-        <Alert variant="warning" key={idx}>
-          {message}
-        </Alert>
-      ))}
-
-      <Form.Group>
         <Form.Label>Content</Form.Label>
         <Form.Control
           as="textarea"
@@ -155,6 +115,29 @@ function PostCreateForm() {
         />
       </Form.Group>
       {errors?.content?.map((message, idx) => (
+        <Alert variant="warning" key={idx}>
+          {message}
+        </Alert>
+      ))}
+
+      <Form.Group>
+        <Form.Label>Category</Form.Label>
+        <Form.Control
+          as="select"
+          name="category_id" // Ensure this matches the backend field name
+          value={category_id}
+          onChange={handleChange}
+        >
+          <option value="">Select a category</option>
+          {Array.isArray(categories) &&
+            categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+        </Form.Control>
+      </Form.Group>
+      {errors?.category_id?.map((message, idx) => (
         <Alert variant="warning" key={idx}>
           {message}
         </Alert>
