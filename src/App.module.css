@@ -6,6 +6,7 @@
 
 .Main {
   padding-top: 81px;
+  min-height: 100vh;
 }
 
 .Content {
