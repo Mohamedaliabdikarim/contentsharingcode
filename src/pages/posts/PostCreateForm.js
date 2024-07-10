@@ -1,5 +1,4 @@
-import React, { useRef, useState } from "react";
-
+import React, { useRef, useState, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -7,15 +6,11 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Alert from "react-bootstrap/Alert";
 import Image from "react-bootstrap/Image";
-
 import Asset from "../../components/Asset";
-
 import Upload from "../../assets/upload.png";
-
 import styles from "../../styles/PostCreateEditForm.module.css";
 import appStyles from "../../App.module.css";
 import btnStyles from "../../styles/Button.module.css";
-
 import { useHistory } from "react-router";
 import { axiosReq } from "../../api/axiosDefaults";
 import { useRedirect } from "../../hooks/useRedirect";
@@ -23,16 +18,33 @@ import { useRedirect } from "../../hooks/useRedirect";
 function PostCreateForm() {
   useRedirect("loggedOut");
   const [errors, setErrors] = useState({});
+  const [categories, setCategories] = useState([]);
 
   const [postData, setPostData] = useState({
     title: "",
     content: "",
     image: "",
+    selectedCategories: [],
   });
-  const { title, content, image } = postData;
+  const { title, content, image, selectedCategories } = postData;
 
   const imageInput = useRef(null);
   const history = useHistory();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axiosReq.get("/categories/");
+        console.log("Fetched Categories:", data);
+        setCategories(data.results || []);
+      } catch (err) {
+        console.log(err);
+        setCategories([]);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleChange = (event) => {
     setPostData({
@@ -51,6 +63,20 @@ function PostCreateForm() {
     }
   };
 
+  const handleCategoryChange = (event) => {
+    const options = event.target.options;
+    const selectedCategories = [];
+    for (let i = 0, l = options.length; i < l; i++) {
+      if (options[i].selected) {
+        selectedCategories.push(options[i].value);
+      }
+    }
+    setPostData({
+      ...postData,
+      selectedCategories: selectedCategories,
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData();
@@ -58,6 +84,14 @@ function PostCreateForm() {
     formData.append("title", title);
     formData.append("content", content);
     formData.append("image", imageInput.current.files[0]);
+
+    selectedCategories.forEach((category) =>
+      formData.append("categories", category)
+    );
+
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
 
     try {
       const { data } = await axiosReq.post("/posts/", formData);
@@ -88,6 +122,29 @@ function PostCreateForm() {
       ))}
 
       <Form.Group>
+        <Form.Label>Category</Form.Label>
+        <Form.Control
+          as="select"
+          name="selectedCategories"
+          value={selectedCategories}
+          onChange={handleCategoryChange}
+          multiple
+        >
+          {Array.isArray(categories) &&
+            categories.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+        </Form.Control>
+      </Form.Group>
+      {errors?.categories?.map((message, idx) => (
+        <Alert variant="warning" key={idx}>
+          {message}
+        </Alert>
+      ))}
+
+      <Form.Group>
         <Form.Label>Content</Form.Label>
         <Form.Control
           as="textarea"
@@ -107,10 +164,10 @@ function PostCreateForm() {
         className={`${btnStyles.Button} ${btnStyles.Blue}`}
         onClick={() => history.goBack()}
       >
-        cancel
+        Cancel
       </Button>
       <Button className={`${btnStyles.Button} ${btnStyles.Blue}`} type="submit">
-        create
+        Create
       </Button>
     </div>
   );
