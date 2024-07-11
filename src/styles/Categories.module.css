@@ -1,0 +1,11 @@
+.CategoryLink {
+    display: block;
+    margin: 0.5rem 0;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .CategoryLink:hover {
+    text-decoration: underline;
+  }
+  

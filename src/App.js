@@ -8,6 +8,7 @@ import SignInForm from "./pages/auth/SignInForm";
 import PostCreateForm from "./pages/posts/PostCreateForm";
 import PostPage from "./pages/posts/PostPage";
 import PostsPage from "./pages/posts/PostsPage";
+import PostByCategory from "./pages/posts/PostByCategory"; // Importer PostByCategory
 import { useCurrentUser } from "./contexts/CurrentUserContext";
 import PostEditForm from "./pages/posts/PostEditForm";
 import ProfilePage from "./pages/profiles/ProfilePage";
@@ -74,10 +75,11 @@ function App() {
             path="/profiles/:id/edit"
             render={() => <ProfileEditForm />}
           />
+          <Route exact path="/categories/:categoryName/posts" render={() => <PostByCategory />} /> {/* Ny rute for PostsByCategory */}
           <Route render={() => <NotFound />} />
         </Switch>
       </Container>
-      <Footer /> {/* Adding Footer here */}
+      <Footer />
     </div>
   );
 }
