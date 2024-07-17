@@ -508,3 +508,7 @@ The pictures used for the sign-in and sign-up pages can be found at the followin
 
 Fonts:
 - [google fonts](https://fonts.google.com/)
+
+# Acknowledgements
+
+This website stands as the culmination of my efforts during the Portfolio 4 Project for the Full Stack Software Developer (e-Commerce) Diploma at the Code Institute. I extend my heartfelt gratitude to my mentor,Jubril Akolade, the invaluable Slack community, and everyone at the Code Institute for their unwavering assistance and support throughout this journey. While Wawas Woods is a fictitious entity, its presence is tangible in every aspect except for the business title. At present, it is more than just a project – it is a passion!
