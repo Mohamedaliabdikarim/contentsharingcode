@@ -1,5 +1,7 @@
+// Importing necessary libraries and components
 import React, { useEffect, useState } from "react";
 
+// Importing Bootstrap components for UI
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
@@ -7,51 +9,58 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 
+// Importing hooks for routing and API interaction
 import { useHistory, useParams } from "react-router-dom";
 import { axiosRes } from "../../api/axiosDefaults";
+
+// Importing user context hooks
 import {
   useCurrentUser,
   useSetCurrentUser,
 } from "../../contexts/CurrentUserContext";
 
+// Importing styles
 import btnStyles from "../../styles/Button.module.css";
 import appStyles from "../../App.module.css";
 
+// Component definition
 const UsernameForm = () => {
-  const [username, setUsername] = useState("");
-  const [errors, setErrors] = useState({});
+  const [username, setUsername] = useState(""); // State for username
+  const [errors, setErrors] = useState({}); // State for error handling
 
-  const history = useHistory();
-  const { id } = useParams();
+  const history = useHistory(); // Hook to navigate programmatically
+  const { id } = useParams(); // Hook to get route parameters
 
-  const currentUser = useCurrentUser();
-  const setCurrentUser = useSetCurrentUser();
+  const currentUser = useCurrentUser(); // Hook to get current user context
+  const setCurrentUser = useSetCurrentUser(); // Hook to set current user context
 
+  // Effect to set the username if the user is authorized
   useEffect(() => {
     if (currentUser?.profile_id?.toString() === id) {
       setUsername(currentUser.username);
     } else {
-      history.push("/");
+      history.push("/"); // Redirect if not authorized
     }
   }, [currentUser, history, id]);
 
+  // Handler for form submission
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Prevent default form submission
     try {
       await axiosRes.put("/dj-rest-auth/user/", {
-        username,
+        username, // Sending updated username to API
       });
       setCurrentUser((prevUser) => ({
         ...prevUser,
-        username,
+        username, // Updating username in context
       }));
-      history.goBack();
+      history.goBack(); // Navigate back on success
     } catch (err) {
-      // console.log(err);
-      setErrors(err.response?.data);
+      setErrors(err.response?.data); // Set error state on failure
     }
   };
 
+  // Component rendering
   return (
     <Row>
       <Col className="py-2 mx-auto text-center" md={6}>
@@ -73,13 +82,13 @@ const UsernameForm = () => {
             ))}
             <Button
               className={`${btnStyles.Button} ${btnStyles.Blue}`}
-              onClick={() => history.goBack()}
+              onClick={() => history.goBack()} // Handler for cancel button
             >
               cancel
             </Button>
             <Button
               className={`${btnStyles.Button} ${btnStyles.Blue}`}
-              type="submit"
+              type="submit" // Handler for submit button
             >
               save
             </Button>
@@ -90,4 +99,5 @@ const UsernameForm = () => {
   );
 };
 
+// Exporting the component as default
 export default UsernameForm;
