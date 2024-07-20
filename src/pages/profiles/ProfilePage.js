@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 
+// Importing Bootstrap components for layout
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 
+// Importing custom components and styles
 import Asset from "../../components/Asset";
-
 import styles from "../../styles/ProfilePage.module.css";
 import appStyles from "../../App.module.css";
 import btnStyles from "../../styles/Button.module.css";
-
 import PopularProfiles from "./PopularProfiles";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
 import { useParams } from "react-router";
@@ -27,18 +27,23 @@ import NoResults from "../../assets/no-results.png";
 import { ProfileEditDropdown } from "../../components/MoreDropdown";
 
 function ProfilePage() {
+  // Local state for loading status and profile posts
   const [hasLoaded, setHasLoaded] = useState(false);
   const [profilePosts, setProfilePosts] = useState({ results: [] });
 
+  // Retrieve current user and profile ID from context and parameters
   const currentUser = useCurrentUser();
   const { id } = useParams();
 
+  // Profile data management
   const { setProfileData, handleFollow, handleUnfollow } = useSetProfileData();
   const { pageProfile } = useProfileData();
 
+  // Extracting profile data
   const [profile] = pageProfile.results;
   const is_owner = currentUser?.username === profile?.owner;
 
+  // Fetch profile and posts data on component mount or id change
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -54,12 +59,14 @@ function ProfilePage() {
         setProfilePosts(profilePosts);
         setHasLoaded(true);
       } catch (err) {
+        // Handle error (optional)
         // console.log(err);
       }
     };
     fetchData();
   }, [id, setProfileData]);
 
+  // Main profile display including image, stats, and follow button
   const mainProfile = (
     <>
       {profile?.is_owner && <ProfileEditDropdown id={profile?.id} />}
@@ -112,6 +119,7 @@ function ProfilePage() {
     </>
   );
 
+  // Display for profile posts with infinite scroll
   const mainProfilePosts = (
     <>
       <hr />

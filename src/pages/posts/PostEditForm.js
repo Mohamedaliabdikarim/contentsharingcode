@@ -17,13 +17,15 @@ import { axiosReq } from "../../api/axiosDefaults";
 
 function PostEditForm() {
   const [errors, setErrors] = useState({});
+  const [categories, setCategories] = useState([]);
 
   const [postData, setPostData] = useState({
     title: "",
     content: "",
     image: "",
+    category_id: "", // Ensure this matches the backend field name
   });
-  const { title, content, image } = postData;
+  const { title, content, image, category_id } = postData;
 
   const imageInput = useRef(null);
   const history = useHistory();
@@ -33,15 +35,30 @@ function PostEditForm() {
     const handleMount = async () => {
       try {
         const { data } = await axiosReq.get(`/posts/${id}/`);
-        const { title, content, image, is_owner } = data;
+        const { title, content, image, category_id, is_owner } = data;
 
-        is_owner ? setPostData({ title, content, image }) : history.push("/");
+        if (is_owner) {
+          setPostData({ title, content, image, category_id });
+        } else {
+          history.push("/");
+        }
       } catch (err) {
-        // console.log(err);
+        console.log(err);
+      }
+    };
+
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axiosReq.get("/categories/");
+        setCategories(data.results || []);
+      } catch (err) {
+        console.log(err);
+        setCategories([]);
       }
     };
 
     handleMount();
+    fetchCategories();
   }, [history, id]);
 
   const handleChange = (event) => {
@@ -71,12 +88,15 @@ function PostEditForm() {
     if (imageInput?.current?.files[0]) {
       formData.append("image", imageInput.current.files[0]);
     }
+    if (category_id) {
+      formData.append("category_id", category_id);
+    }
 
     try {
       await axiosReq.put(`/posts/${id}/`, formData);
       history.push(`/posts/${id}`);
     } catch (err) {
-      // console.log(err);
+      console.log(err);
       if (err.response?.status !== 401) {
         setErrors(err.response?.data);
       }
@@ -116,14 +136,37 @@ function PostEditForm() {
         </Alert>
       ))}
 
+      <Form.Group>
+        <Form.Label>Category</Form.Label>
+        <Form.Control
+          as="select"
+          name="category_id" // Ensure this matches the backend field name
+          value={category_id}
+          onChange={handleChange}
+        >
+          <option value="">Select a category</option>
+          {Array.isArray(categories) &&
+            categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+        </Form.Control>
+      </Form.Group>
+      {errors?.category_id?.map((message, idx) => (
+        <Alert variant="warning" key={idx}>
+          {message}
+        </Alert>
+      ))}
+
       <Button
         className={`${btnStyles.Button} ${btnStyles.Blue}`}
         onClick={() => history.goBack()}
       >
-        cancel
+        Cancel
       </Button>
       <Button className={`${btnStyles.Button} ${btnStyles.Blue}`} type="submit">
-        save
+        Save
       </Button>
     </div>
   );

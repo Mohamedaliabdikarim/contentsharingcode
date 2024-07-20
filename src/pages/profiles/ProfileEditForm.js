@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
+// Importing Bootstrap components for the form and layout
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Image from "react-bootstrap/Image";
@@ -9,31 +10,39 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Alert from "react-bootstrap/Alert";
 
+// Importing Axios for API requests and context for user data
 import { axiosReq } from "../../api/axiosDefaults";
 import {
   useCurrentUser,
   useSetCurrentUser,
 } from "../../contexts/CurrentUserContext";
 
+// Importing custom styles
 import btnStyles from "../../styles/Button.module.css";
 import appStyles from "../../App.module.css";
 
 const ProfileEditForm = () => {
+  // Get current user and functions to manage user data
   const currentUser = useCurrentUser();
   const setCurrentUser = useSetCurrentUser();
+
+  // Get profile ID from URL parameters and history for navigation
   const { id } = useParams();
   const history = useHistory();
+
+  // Reference to the image file input
   const imageFile = useRef();
 
+  // State for profile data and errors
   const [profileData, setProfileData] = useState({
     name: "",
     content: "",
     image: "",
   });
   const { name, content, image } = profileData;
-
   const [errors, setErrors] = useState({});
 
+  // Fetch profile data on component mount or ID change
   useEffect(() => {
     const handleMount = async () => {
       if (currentUser?.profile_id?.toString() === id) {
@@ -42,7 +51,7 @@ const ProfileEditForm = () => {
           const { name, content, image } = data;
           setProfileData({ name, content, image });
         } catch (err) {
-          // console.log(err);
+          // Redirect to home if an error occurs
           history.push("/");
         }
       } else {
@@ -53,6 +62,7 @@ const ProfileEditForm = () => {
     handleMount();
   }, [currentUser, history, id]);
 
+  // Handle form field changes
   const handleChange = (event) => {
     setProfileData({
       ...profileData,
@@ -60,6 +70,7 @@ const ProfileEditForm = () => {
     });
   };
 
+  // Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData();
@@ -78,11 +89,11 @@ const ProfileEditForm = () => {
       }));
       history.goBack();
     } catch (err) {
-      // console.log(err);
       setErrors(err.response?.data);
     }
   };
 
+  // Text fields for the form
   const textFields = (
     <>
       <Form.Group>

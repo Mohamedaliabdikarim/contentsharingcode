@@ -10,6 +10,7 @@ import { useCurrentUser } from "../../contexts/CurrentUserContext";
 import { axiosRes } from "../../api/axiosDefaults";
 
 const Comment = (props) => {
+  // Destructuring props to extract comment details and setter functions
   const {
     profile_id,
     profile_image,
@@ -21,13 +22,16 @@ const Comment = (props) => {
     setComments,
   } = props;
 
+  // State to toggle the edit form visibility
   const [showEditForm, setShowEditForm] = useState(false);
   const currentUser = useCurrentUser();
   const is_owner = currentUser?.username === owner;
 
+  // Function to delete the comment
   const handleDelete = async () => {
     try {
       await axiosRes.delete(`/comments/${id}/`);
+      // Update post comment count
       setPost((prevPost) => ({
         results: [
           {
@@ -36,18 +40,22 @@ const Comment = (props) => {
           },
         ],
       }));
-
+      // Remove deleted comment from the comments list
       setComments((prevComments) => ({
         ...prevComments,
         results: prevComments.results.filter((comment) => comment.id !== id),
       }));
-    } catch (err) {}
+    } catch (err) {
+      // Handle error (optional)
+      // console.log(err);
+    }
   };
 
   return (
     <>
       <hr />
       <Media>
+        {/* Link to the profile of the comment owner */}
         <Link to={`/profiles/${profile_id}`}>
           <Avatar src={profile_image} />
         </Link>
@@ -55,6 +63,7 @@ const Comment = (props) => {
           <span className={styles.Owner}>{owner}</span>
           <span className={styles.Date}>{updated_at}</span>
           {showEditForm ? (
+            // Display the comment edit form if showEditForm is true
             <CommentEditForm
               id={id}
               profile_id={profile_id}
@@ -64,9 +73,11 @@ const Comment = (props) => {
               setShowEditForm={setShowEditForm}
             />
           ) : (
+            // Display the comment content if showEditForm is false
             <p>{content}</p>
           )}
         </Media.Body>
+        {/* Display edit and delete options if the user is the owner and not editing */}
         {is_owner && !showEditForm && (
           <MoreDropdown
             handleEdit={() => setShowEditForm(true)}

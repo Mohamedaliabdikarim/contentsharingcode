@@ -393,65 +393,31 @@ To use this hook, import it and pass the user's authentication status to it. The
 - **Redirection**: Redirects the user based on their authentication status, sending logged-in users to the home page ("/") and ensuring logged-out users are also redirected to the home page ("/").
 
 # Testing
-### Manual testing
-I have thoroughly tested the application to ensure that all functionalities work as expected. Here is a summary of the tests performed:
+For detailed testing results, please refer to the [test.md](test.md) file located in the same folder.
+# Testing
 
-## Features Tested
+## Overview
+This document outlines the tests conducted on the application and their results.
 
-### Sign In
-- **Description**: Tested the user sign-in process.
-- **Result**: Users are able to sign in successfully with valid credentials. Proper error messages are displayed for invalid credentials.
+## Test Cases
 
-### Sign Up
-- **Description**: Tested the user sign-up process.
-- **Result**: New users can register successfully. Appropriate validations and error messages are in place for invalid input.
+### User Authentication
+- **Sign Up**: Tested with valid and invalid data. All cases passed.
+- **Sign In**: Tested with valid and invalid credentials. All cases passed.
+- **Sign Out**: Tested to ensure session termination. All cases passed.
 
-### Add Post
-- **Description**: Tested the functionality to add new posts.
-- **Result**: Users can add new posts successfully. Posts appear in the feed as expected.
+### Post Functionality
+- **Add Post**: Tested adding posts with various content types. All cases passed.
+- **Edit Post**: Tested editing existing posts. All cases passed.
+- **Delete Post**: Tested deletion of posts. All cases passed.
 
-### Like Post
-- **Description**: Tested the ability to like posts.
-- **Result**: Users can like and unlike posts. The like count updates correctly.
-
-### Comment on Post
-- **Description**: Tested the ability to comment on posts.
-- **Result**: Users can add comments to posts. Comments appear under the corresponding post correctly.
+### Interactions
+- **Like Post**: Tested liking and unliking posts. All cases passed.
+- **Comment on Post**: Tested adding, editing, and deleting comments. All cases passed.
 
 ## Conclusion
 All tested features are working as intended. The application is functioning smoothly with no critical issues found. Users should be able to sign in, sign up, add posts, like, and comment without any problems.
 
-## Validator testing
-
-#### W3C CSS validator
-All CSS files were passed through the W3C validator.
-#### ESLint JavaScript validator
-All JavaScript files were validated using ESLint. The following issues were identified and corrected:
-- Removed unnecessary semicolons at the end of some statements.
-- Escaped apostrophes in HTML text in certain components.
-- Eliminated an unused variable.
-- Added missing React import statements.
-
-## Lighthouse Testing Results
-
-This project has been evaluated using Google Lighthouse, a tool for improving the quality of web pages. The following scores were achieved:
-![](readme_assets/lighthouse.png)
-
-## Summary
-
-The Lighthouse testing results indicate the overall quality and optimization of the web application. Below is a detailed breakdown of each category.
-
-### Performance (91)
-A performance score of 91 reflects a well-optimized web application. This score measures how quickly content is painted and interactive for users, taking into account factors like load time, resource sizes, and caching strategies.
-
-### Accessibility (87)
-An accessibility score of 87 shows a strong commitment to making the web application usable by people with disabilities. This includes ensuring proper contrast ratios, semantic HTML, and assistive technology support.
-
-### Best Practices (74)
-A best practices score of 74 suggests there is room for improvement in terms of modern web development practices. This score covers aspects like security, user experience, and the use of deprecated APIs.
-
-### SEO (100)
-A perfect SEO score of 100 indicates the web application is highly optimized for search engines, ensuring maximum visibility and discoverability through proper metadata, content structure, and performance optimizations.
 
 ## Resolved bugs
 

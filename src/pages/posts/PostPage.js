@@ -14,13 +14,12 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import Asset from "../../components/Asset";
 import { fetchMoreData } from "../../utils/utils";
 import PopularProfiles from "../profiles/PopularProfiles";
-import CategoryList from "../category/CategoryList"; // Import CategoryList
-import PostByCategory from "./PostByCategory"; // Import PostByCategory
+
 
 function PostPage() {
   const { id } = useParams();
   const [post, setPost] = useState({ results: [] });
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  
 
   const currentUser = useCurrentUser();
   const profile_image = currentUser?.profile_image;
@@ -84,8 +83,8 @@ function PostPage() {
       </Col>
       <Col lg={4} className="d-none d-lg-block p-0 p-lg-2">
         <PopularProfiles />
-        <CategoryList onSelectCategory={setSelectedCategory} />
-        {selectedCategory && <PostByCategory categoryName={selectedCategory} />}
+      
+        
       </Col>
     </Row>
   );
