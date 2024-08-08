@@ -8,7 +8,7 @@ import appStyles from "../../App.module.css";
 import Asset from "../../components/Asset";
 import { useProfileData } from "../../contexts/ProfileDataContext";
 import Profile from "./Profile";
-import SearchInfoBox from "./SearchInfoBox";  // Import the new component
+
 
 const PopularProfiles = ({ mobile }) => {
   // Retrieve popular profiles data from context
@@ -43,10 +43,7 @@ const PopularProfiles = ({ mobile }) => {
           <Asset spinner />
         )}
       </Container>
-      {/* Display SearchInfoBox component */}
-      <Container>
-        <SearchInfoBox />
-      </Container>
+      
     </>
   );
 };
